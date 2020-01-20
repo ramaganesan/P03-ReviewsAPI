@@ -73,8 +73,8 @@ public class ReviewsController {
      * @return The list of reviews.
      */
     @RequestMapping(value = "/reviews/products/{productId}", method = RequestMethod.GET)
-    public ResponseEntity<Collection<ReviewObjectDto>> listReviewsForProduct(@PathVariable("productId") Integer productId) {
-        Collection<Review> reviews = reviewService.listReviewsForProduct(productId);
+    public ResponseEntity<Collection<ReviewObjectDto>> listReviewsForProduct(@PathVariable("productId") Integer productId,@RequestParam(value = "pageNum", required = true) Integer pageNum, @RequestParam(value = "numElements", required = true) Integer numElements) {
+        Collection<Review> reviews = reviewService.listReviewsForProduct(productId, pageNum, numElements);
         return new ResponseEntity<>(convertToReviewDtoCollection(reviews),HttpStatus.OK);
     }
 

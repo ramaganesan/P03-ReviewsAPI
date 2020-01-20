@@ -12,6 +12,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -87,7 +89,8 @@ public class ReviewRepositoryTest {
 
     @Test
     void findReviewViaProduct(){
-      Collection<Review> reviews = reviewRepository.findByProductProductId(1);
+        Pageable pageable = PageRequest.of(0,100);
+      Collection<Review> reviews = reviewRepository.findByProductProductId(1, pageable);
         assertThat(reviews.size()).isGreaterThan(0);
     }
 

@@ -10,6 +10,8 @@ import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -45,10 +47,11 @@ public class ReviewService {
         return review;
     }
 
-    public Collection<Review> listReviewsForProduct(Integer productId){
+    public Collection<Review> listReviewsForProduct(Integer productId, Integer pageNum, Integer numElements){
         Optional<Product> productOptional = productRepository.findById(productId);
         Product product = productOptional.orElseThrow(() -> new ResourceNotFoundException("No Product found for id: " + productId));
-        Collection<Review> reviews = reviewRepository.findByProductProductId(product.getProductId());
+        Pageable pageable = PageRequest.of(pageNum, numElements);
+        Collection<Review> reviews = reviewRepository.findByProductProductId(product.getProductId(), pageable);
         return reviews;
 
     }

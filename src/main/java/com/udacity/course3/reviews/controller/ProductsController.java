@@ -64,12 +64,12 @@ public class ProductsController {
      * @return The product if found, or a 404 not found.
      */
     @RequestMapping(value = "/{id}")
-    public ResponseEntity<?> findById(@PathVariable("id") Integer id, @RequestParam(value = "includeReview", required = false) boolean includeReview) throws ResourceNotFoundException{
+    public ResponseEntity<?> findById(@PathVariable("id") Integer id, @RequestParam(value = "includeReview", required = false) boolean includeReview, @RequestParam(value = "pageNum", required = true) Integer pageNum, @RequestParam(value = "numElements", required = true) Integer numElements ) throws ResourceNotFoundException{
         Product product = productService.findById(id);
         Collection<ReviewDto> reviewDtos = new ArrayList<>();
         if(includeReview == true) {
             logger.info("Required to get Reviews for the product as well");
-            reviewDtos.addAll(productService.getReviewsForProduct(product.getProductId()));
+            reviewDtos.addAll(productService.getReviewsForProduct(product.getProductId(), pageNum, numElements));
         }
         return new ResponseEntity(convertToProductDto(product,reviewDtos), HttpStatus.OK);
     }

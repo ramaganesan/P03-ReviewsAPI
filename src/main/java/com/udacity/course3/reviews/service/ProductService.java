@@ -1,17 +1,16 @@
 package com.udacity.course3.reviews.service;
 
-import com.udacity.course3.reviews.controller.ProductsController;
 import com.udacity.course3.reviews.domain.Product;
 import com.udacity.course3.reviews.dto.ReviewDto;
 import com.udacity.course3.reviews.exception.ResourceNotFoundException;
 import com.udacity.course3.reviews.repository.ProductRepository;
-import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.criteria.CriteriaBuilder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -41,8 +40,9 @@ public class ProductService {
         return  product;
     }
 
-    public Collection<ReviewDto> getReviewsForProduct(Integer productId){
-        return productRepository.getReviewsForProduct(productId);
+    public Collection<ReviewDto> getReviewsForProduct(Integer productId, Integer pageNum, Integer numElements){
+        Pageable pageable = PageRequest.of(pageNum,numElements);
+        return productRepository.getReviewsForProduct(productId,pageable);
     }
 
     public List<Product> listProducts(){
