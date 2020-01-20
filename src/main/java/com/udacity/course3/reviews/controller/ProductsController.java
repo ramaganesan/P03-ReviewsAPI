@@ -5,6 +5,7 @@ import com.udacity.course3.reviews.dto.ProductDto;
 import com.udacity.course3.reviews.dto.ReviewDto;
 import com.udacity.course3.reviews.exception.ResourceNotFoundException;
 import com.udacity.course3.reviews.repository.ProductRepository;
+import com.udacity.course3.reviews.service.ProductService;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -31,12 +32,12 @@ public class ProductsController {
     // TODO: Wire JPA repositories here
    private static final Logger logger = LoggerFactory.getLogger(ProductsController.class);
 
-    private final ProductRepository productRepository;
+    private final ProductService productService;
 
     private final ModelMapper modelMapper;
 
-    public  ProductsController(@Autowired ProductRepository productRepository, @Autowired ModelMapper modelMapper){
-        this.productRepository = productRepository;
+    public  ProductsController(@Autowired ProductService productService, @Autowired ModelMapper modelMapper){
+        this.productService = productService;
         this.modelMapper = modelMapper;
     }
 
@@ -50,7 +51,7 @@ public class ProductsController {
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<ProductDto> createProduct(@Valid @RequestBody ProductDto productDto) {
       Product product = convertToProduct(productDto);
-      product = productRepository.save(product);
+      product = productService.createProduct(product);
       productDto = convertToProductDto(product,null);
       return new ResponseEntity<>(productDto, HttpStatus.CREATED);
 
@@ -64,12 +65,11 @@ public class ProductsController {
      */
     @RequestMapping(value = "/{id}")
     public ResponseEntity<?> findById(@PathVariable("id") Integer id, @RequestParam(value = "includeReview", required = false) boolean includeReview) throws ResourceNotFoundException{
-        Optional<Product> productOptional = productRepository.findById(id);
-        Product product = productOptional.orElseThrow(() -> new ResourceNotFoundException("No Product found for id: " + id));
+        Product product = productService.findById(id);
         Collection<ReviewDto> reviewDtos = new ArrayList<>();
         if(includeReview == true) {
             logger.info("Required to get Reviews for the product as well");
-            reviewDtos.addAll(productRepository.getReviewsForProduct(product.getProductId()));
+            reviewDtos.addAll(productService.getReviewsForProduct(product.getProductId()));
         }
         return new ResponseEntity(convertToProductDto(product,reviewDtos), HttpStatus.OK);
     }
@@ -81,10 +81,7 @@ public class ProductsController {
      */
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public List<?> listProducts() {
-       List<Product> products = new ArrayList<>();
-       Iterable<Product> productIterable = productRepository.findAll();
-       productIterable.forEach(product -> products.add(product));
-       return products;
+      return productService.listProducts();
 
     }
 

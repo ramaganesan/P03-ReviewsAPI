@@ -8,6 +8,8 @@ import com.udacity.course3.reviews.dto.ReviewObjectDto;
 import com.udacity.course3.reviews.exception.ResourceNotFoundException;
 import com.udacity.course3.reviews.repository.ProductRepository;
 import com.udacity.course3.reviews.repository.ReviewRepository;
+import com.udacity.course3.reviews.service.ProductService;
+import com.udacity.course3.reviews.service.ReviewService;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -36,14 +38,11 @@ public class ReviewsController {
 
     private final ModelMapper modelMapper;
 
-    private final ProductRepository productRepository;
+    private final ReviewService reviewService;
 
-    private final ReviewRepository reviewRepository;
-
-    public ReviewsController(@Autowired ModelMapper modelMapper, @Autowired ProductRepository productRepository, @Autowired  ReviewRepository reviewRepository){
+    public ReviewsController(@Autowired ModelMapper modelMapper, @Autowired ReviewService reviewService){
         this.modelMapper = modelMapper;
-        this.productRepository = productRepository;
-        this.reviewRepository = reviewRepository;
+        this.reviewService = reviewService;
     }
 
 
@@ -60,11 +59,9 @@ public class ReviewsController {
      */
     @RequestMapping(value = "/reviews/products/{productId}", method = RequestMethod.POST)
     public ResponseEntity<?> createReviewForProduct(@PathVariable("productId") Integer productId,@Valid @RequestBody ReviewObjectDto reviewObjectDto) {
-        Optional<Product> productOptional = productRepository.findById(productId);
-        Product product = productOptional.orElseThrow(() -> new ResourceNotFoundException("No Product found for id: " + productId));
+
         Review review = convertToReview(reviewObjectDto);
-        review.setProduct(product);
-        review = reviewRepository.save(review);
+        review = reviewService.createReviewForProduct(productId,review);
         return new ResponseEntity<>(convertToReviewObjectDto(review),HttpStatus.CREATED);
 
     }
@@ -77,9 +74,7 @@ public class ReviewsController {
      */
     @RequestMapping(value = "/reviews/products/{productId}", method = RequestMethod.GET)
     public ResponseEntity<Collection<ReviewObjectDto>> listReviewsForProduct(@PathVariable("productId") Integer productId) {
-        Optional<Product> productOptional = productRepository.findById(productId);
-        Product product = productOptional.orElseThrow(() -> new ResourceNotFoundException("No Product found for id: " + productId));
-        Collection<Review> reviews = reviewRepository.findByProductProductId(product.getProductId());
+        Collection<Review> reviews = reviewService.listReviewsForProduct(productId);
         return new ResponseEntity<>(convertToReviewDtoCollection(reviews),HttpStatus.OK);
     }
 
