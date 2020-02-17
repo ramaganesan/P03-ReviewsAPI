@@ -1,5 +1,7 @@
 package com.udacity.course3.reviews.controller;
 
+import com.udacity.course3.reviews.document.CommentDocument;
+import com.udacity.course3.reviews.document.ReviewDocument;
 import com.udacity.course3.reviews.domain.Comment;
 import com.udacity.course3.reviews.domain.Review;
 import com.udacity.course3.reviews.dto.CommentDto;
@@ -7,7 +9,10 @@ import com.udacity.course3.reviews.dto.ReviewObjectDto;
 import com.udacity.course3.reviews.exception.ResourceNotFoundException;
 import com.udacity.course3.reviews.repository.CommentsRepository;
 import com.udacity.course3.reviews.repository.ReviewRepository;
+import com.udacity.course3.reviews.service.ReviewService;
+import com.udacity.course3.reviews.utils.ReviewApplicationUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.types.ObjectId;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpServerErrorException;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -33,15 +39,12 @@ public class CommentsController {
 
     private final static Logger logger = LoggerFactory.getLogger(CommentsController.class);
 
-    private final CommentsRepository commentsRepository;
-
-    private final ReviewRepository reviewRepository;
+    private final ReviewService reviewService;
 
     private final ModelMapper modelMapper;
 
-    public CommentsController(@Autowired CommentsRepository commentsRepository, @Autowired ReviewRepository reviewRepository, @Autowired ModelMapper modelMapper){
-        this.commentsRepository = commentsRepository;
-        this.reviewRepository = reviewRepository;
+    public CommentsController( @Autowired ReviewService reviewService, @Autowired ModelMapper modelMapper){
+        this.reviewService = reviewService;
         this.modelMapper = modelMapper;
     }
 
@@ -58,13 +61,10 @@ public class CommentsController {
      * @param reviewId The id of the review.
      */
     @RequestMapping(value = "/reviews/{reviewId}", method = RequestMethod.POST)
-    public ResponseEntity<?> createCommentForReview(@PathVariable("reviewId") Integer reviewId, @Valid @RequestBody CommentDto commentDto) {
-        Optional<Review> optionalReview = reviewRepository.findById(reviewId);
-        Review review = optionalReview.orElseThrow(() -> new ResourceNotFoundException("No review found for id: " + reviewId));
-        Comment comment = convertToComment(commentDto);
-        review.addComment(comment);
-        comment = commentsRepository.save(comment);
-        return new ResponseEntity<>(convertToCommentDto(comment),HttpStatus.CREATED);
+    public ResponseEntity<?> createCommentForReview(@PathVariable("reviewId") ObjectId reviewId, @Valid @RequestBody CommentDto commentDto) {
+        CommentDocument commentDocument = ReviewApplicationUtils.convertCommentDtoToCommentDocument(commentDto,modelMapper);
+        ReviewDocument reviewDocument = reviewService.createCommentForReview(reviewId,commentDocument);
+        return new ResponseEntity<>(reviewDocument,HttpStatus.CREATED);
     }
 
     /**
@@ -74,28 +74,28 @@ public class CommentsController {
      * 3. If review not found, return NOT_FOUND.
      * 4. If found, return list of comments.
      *
-     * @param reviewId The id of the review.
+     * @param reviewId The Objectid of the review.
      */
     @RequestMapping(value = "/reviews/{reviewId}", method = RequestMethod.GET)
-    public ResponseEntity<?> listCommentsForReview(@PathVariable("reviewId") Integer reviewId) {
-        Optional<Review> optionalReview = reviewRepository.findById(reviewId);
-        Review review = optionalReview.orElseThrow(() -> new ResourceNotFoundException("No review found for id: " + reviewId));
-        Collection<Comment> commentCollection = commentsRepository.findByReviewReviewId(reviewId);
-        Collection<CommentDto> commentDtos = commentCollection.stream().map(comment -> convertToCommentDto(comment)).collect(Collectors.toList());
+    public ResponseEntity<?> listCommentsForReview(@PathVariable("reviewId") ObjectId reviewId) {
+        ReviewDocument reviewDocument = reviewService.findReviewDocument(reviewId);
+        Collection<CommentDto> commentDtos = new ArrayList<>();
+        ReviewApplicationUtils.convertCommentDocumnetsToCommentDTO(reviewDocument.getCommentDocuments(),commentDtos,modelMapper);
         return new ResponseEntity(commentDtos,HttpStatus.OK);
     }
 
-    private CommentDto convertToCommentDto(Comment comment){
-        return modelMapper.map(comment,CommentDto.class);
+    /**
+     *
+     * @param commentId
+     * @param commentDto
+     * @return HttpStatus
+     */
+    public ResponseEntity<?> updateComments(@PathVariable("commentId") ObjectId commentId, @Valid @RequestBody CommentDto commentDto){
+        CommentDocument commentDocument = ReviewApplicationUtils.convertCommentDtoToCommentDocument(commentDto,modelMapper);
+        commentDocument.set_id(commentId);
+        reviewService.updateCommentDocument(commentDocument);
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
-    private Comment convertToComment(CommentDto commentDto){
-        return modelMapper.map(commentDto,Comment.class);
-    }
 
-    private ReviewObjectDto convertToReviewObjectDto(Review review){
-        ReviewObjectDto reviewObjectDto = modelMapper.map(review,ReviewObjectDto.class);
-        //reviewObjectDto.addCommentDto(review.getComments());
-        return reviewObjectDto;
-    }
 }

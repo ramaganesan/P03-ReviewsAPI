@@ -6,6 +6,7 @@ import com.udacity.course3.reviews.domain.RatingsEnum;
 import com.udacity.course3.reviews.domain.Review;
 import com.udacity.course3.reviews.dto.ReviewDto;
 import com.udacity.course3.reviews.exception.ResourceNotFoundException;
+import com.udacity.course3.reviews.utils.TestUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -49,7 +50,7 @@ public class ReviewRepositoryTest {
   @Test
   void saveReview(){
       Product product = productRepository.findById(1).get();
-      Review review = getReview(RatingsEnum.GOOD,"good review","good review", "john", "amazon", product);
+      Review review = TestUtils.getReview(RatingsEnum.GOOD,"good review","good review", "john", "amazon", product);
       review = reviewRepository.save(review);
       assertThat(review.getReviewId()).isNotZero();
   }
@@ -93,11 +94,5 @@ public class ReviewRepositoryTest {
       Collection<Review> reviews = reviewRepository.findByProductProductId(1, pageable);
         assertThat(reviews.size()).isGreaterThan(0);
     }
-
-  public static Review getReview(RatingsEnum ratingsEnum, String reviewName, String reviewBody, String author, String publisher, Product product){
-
-      Review review = Review.builder().reviewRating(ratingsEnum).name(reviewName).reviewBody(reviewBody).author(author).publisher(publisher).product(product).build();
-      return review;
-  }
 
 }

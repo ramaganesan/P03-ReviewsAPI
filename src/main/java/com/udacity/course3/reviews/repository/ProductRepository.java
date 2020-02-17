@@ -16,6 +16,6 @@ import java.util.List;
 @Repository
 public interface ProductRepository extends PagingAndSortingRepository<Product, Integer> {
 
-    @Query(value = "select r.review_id as reviewId , r.review_rating as reviewRating,r.name as name,r.review_body as reviewBody,r.author as author,r.publisher as publisher,r.product_id as productId from product p join review r on p.product_id = r.product_id and p.product_id = :product_id" , nativeQuery = true)
+    @Query(value = "select r.review_id as reviewId , r.review_rating as reviewRating,r.name as name,r.review_body as reviewBody,r.author as author,r.publisher as publisher,r.product_id as productId, r.create_dt as createDate, r.update_dt as updateDate from product p join review r on p.product_id = r.product_id and p.product_id = :product_id" , nativeQuery = true)
     List<ReviewDto> getReviewsForProduct(@Param("product_id") Integer productId, Pageable pageable);
 }

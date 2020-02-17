@@ -2,6 +2,7 @@ package com.udacity.course3.reviews.repository;
 
 import com.udacity.course3.reviews.domain.Product;
 import com.udacity.course3.reviews.exception.ResourceNotFoundException;
+import com.udacity.course3.reviews.utils.TestUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,7 +41,7 @@ public class ProductRepositoryTest {
 
     @Test
     void saveProduct(){
-        Product product = getProduct("saveProductTestName", "saveProductTestdesc", "saveProductTestImage");
+        Product product = TestUtils.getProduct("saveProductTestName", "saveProductTestdesc", "saveProductTestImage");
         product = productRepository.save(product);
         assertThat(product.getProductId()).isGreaterThan(0);
     }
@@ -74,8 +75,4 @@ public class ProductRepositoryTest {
         assertThat(exception.getMessage()).isEqualToIgnoringCase(exceptionMessage);
     }
 
-    public static Product getProduct(String name, String description, String image){
-        Product product = Product.builder().name(name).description(description).image(image).build();
-        return product;
-    }
 }

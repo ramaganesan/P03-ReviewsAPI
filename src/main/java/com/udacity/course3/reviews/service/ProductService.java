@@ -1,9 +1,15 @@
 package com.udacity.course3.reviews.service;
 
+import com.udacity.course3.reviews.document.ReviewDocument;
 import com.udacity.course3.reviews.domain.Product;
 import com.udacity.course3.reviews.dto.ReviewDto;
+import com.udacity.course3.reviews.dto.ReviewObjectDto;
 import com.udacity.course3.reviews.exception.ResourceNotFoundException;
+import com.udacity.course3.reviews.mongorepository.ReviewRepository;
 import com.udacity.course3.reviews.repository.ProductRepository;
+import com.udacity.course3.reviews.utils.ReviewApplicationUtils;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +17,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -23,10 +30,16 @@ public class ProductService {
 
     private final ProductRepository productRepository;
 
+    private final ReviewRepository mongoReviewRepository;
+
+    private final ModelMapper modelMapper;
 
 
-    public ProductService(@Autowired ProductRepository productRepository ){
+
+    public ProductService(@Autowired ProductRepository productRepository, @Autowired ReviewRepository mongoReviewRepository, @Autowired ModelMapper modelMapper ){
         this.productRepository = productRepository;
+        this.mongoReviewRepository = mongoReviewRepository;
+        this.modelMapper = modelMapper;
     }
 
     public Product createProduct(Product product){
@@ -40,9 +53,14 @@ public class ProductService {
         return  product;
     }
 
-    public Collection<ReviewDto> getReviewsForProduct(Integer productId, Integer pageNum, Integer numElements){
+    public Collection<ReviewObjectDto> getReviewsForProduct(Integer productId, Integer pageNum, Integer numElements){
         Pageable pageable = PageRequest.of(pageNum,numElements);
-        return productRepository.getReviewsForProduct(productId,pageable);
+        Collection<ReviewObjectDto> reviewObjectDtos = new ArrayList<>();
+        List<ReviewDto> reviewDtos = productRepository.getReviewsForProduct(productId,pageable);
+        ReviewApplicationUtils.convertReviewObjectsToReviewObjectsDTO(reviewObjectDtos,reviewDtos,modelMapper);
+        List<ReviewDocument> reviewDocuments = mongoReviewRepository.findReviewDocumentByProductId(productId,pageable);
+        ReviewApplicationUtils.convertReviewDocumentsToReviewObjectsDTO(reviewObjectDtos,reviewDocuments,modelMapper);
+        return reviewObjectDtos;
     }
 
     public List<Product> listProducts(){
@@ -51,4 +69,5 @@ public class ProductService {
         productIterable.forEach(product -> products.add(product));
         return products;
     }
+
 }

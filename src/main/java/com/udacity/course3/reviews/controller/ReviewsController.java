@@ -1,5 +1,6 @@
 package com.udacity.course3.reviews.controller;
 
+import com.udacity.course3.reviews.document.ReviewDocument;
 import com.udacity.course3.reviews.domain.Product;
 import com.udacity.course3.reviews.domain.Review;
 import com.udacity.course3.reviews.dto.ProductDto;
@@ -10,6 +11,7 @@ import com.udacity.course3.reviews.repository.ProductRepository;
 import com.udacity.course3.reviews.repository.ReviewRepository;
 import com.udacity.course3.reviews.service.ProductService;
 import com.udacity.course3.reviews.service.ReviewService;
+import com.udacity.course3.reviews.utils.ReviewApplicationUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -60,9 +62,10 @@ public class ReviewsController {
     @RequestMapping(value = "/reviews/products/{productId}", method = RequestMethod.POST)
     public ResponseEntity<?> createReviewForProduct(@PathVariable("productId") Integer productId,@Valid @RequestBody ReviewObjectDto reviewObjectDto) {
 
-        Review review = convertToReview(reviewObjectDto);
-        review = reviewService.createReviewForProduct(productId,review);
-        return new ResponseEntity<>(convertToReviewObjectDto(review),HttpStatus.CREATED);
+        ReviewDocument reviewDocument = ReviewApplicationUtils.convertReviewObjectDtosToReviewDocument(reviewObjectDto,modelMapper);
+
+        reviewDocument = reviewService.createReviewDocumentForProduct(productId,reviewDocument);
+        return new ResponseEntity<>(ReviewApplicationUtils.convertReviewDocumentToReviewObjectDto(reviewDocument,modelMapper),HttpStatus.CREATED);
 
     }
 
@@ -74,8 +77,8 @@ public class ReviewsController {
      */
     @RequestMapping(value = "/reviews/products/{productId}", method = RequestMethod.GET)
     public ResponseEntity<Collection<ReviewObjectDto>> listReviewsForProduct(@PathVariable("productId") Integer productId,@RequestParam(value = "pageNum", required = true) Integer pageNum, @RequestParam(value = "numElements", required = true) Integer numElements) {
-        Collection<Review> reviews = reviewService.listReviewsForProduct(productId, pageNum, numElements);
-        return new ResponseEntity<>(convertToReviewDtoCollection(reviews),HttpStatus.OK);
+        Collection<ReviewObjectDto> reviewObjectDtos = reviewService.listReviewsForProduct(productId, pageNum, numElements);
+        return new ResponseEntity<>(reviewObjectDtos,HttpStatus.OK);
     }
 
     private Review convertToReview(ReviewObjectDto reviewObjectDto){
@@ -88,15 +91,5 @@ public class ReviewsController {
         return reviewObjectDto;
     }
 
-    private Collection<ReviewObjectDto> convertToReviewDtoCollection(Collection<Review> reviewCollection){
-       return reviewCollection.stream().map(review -> convertToReviewObjectDto(review)).collect(Collectors.toList());
-    }
 
-    private ProductDto convertToProductDto(Product product, Collection<ReviewDto> reviewDtos){
-        ProductDto productDto = modelMapper.map(product, ProductDto.class);
-        if(reviewDtos != null && !reviewDtos.isEmpty()){
-            productDto.setReviewDtos(reviewDtos);
-        }
-        return productDto;
-    }
 }

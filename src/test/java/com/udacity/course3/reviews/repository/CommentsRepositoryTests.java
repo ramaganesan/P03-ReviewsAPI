@@ -3,6 +3,7 @@ package com.udacity.course3.reviews.repository;
 import com.udacity.course3.reviews.domain.Comment;
 import com.udacity.course3.reviews.domain.Review;
 import com.udacity.course3.reviews.exception.ResourceNotFoundException;
+import com.udacity.course3.reviews.utils.TestUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -46,7 +47,7 @@ public class CommentsRepositoryTests {
         String commentBody = "comment_body5";
         Review review = reviewRepository.findById(1).orElse(null);
         assertThat(review).isNotNull();
-        Comment comment = buildComment(commentBody,1,0,review);
+        Comment comment = TestUtils.buildComment(commentBody,1,0,review);
         review.addComment(comment);
         comment = commentsRepository.save(comment);
         review = reviewRepository.findById(1).orElse(null);
@@ -93,9 +94,4 @@ public class CommentsRepositoryTests {
         assertThat(exception.getMessage()).isEqualToIgnoringCase(exceptionMessage);
     }
 
-
-    private static Comment buildComment(String commentBody, Integer upVoteCount, Integer downVoteCount, Review review){
-        Comment comment = Comment.builder().commentBody(commentBody).upvoteCount(upVoteCount).downVoteCount(downVoteCount).review(review).build();
-        return comment;
-    }
 }

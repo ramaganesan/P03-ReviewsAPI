@@ -3,11 +3,13 @@ package com.udacity.course3.reviews.controller;
 import com.udacity.course3.reviews.domain.Product;
 import com.udacity.course3.reviews.dto.ProductDto;
 import com.udacity.course3.reviews.dto.ReviewDto;
+import com.udacity.course3.reviews.dto.ReviewObjectDto;
 import com.udacity.course3.reviews.exception.ResourceNotFoundException;
 import com.udacity.course3.reviews.repository.ProductRepository;
 import com.udacity.course3.reviews.service.ProductService;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -66,12 +69,12 @@ public class ProductsController {
     @RequestMapping(value = "/{id}")
     public ResponseEntity<?> findById(@PathVariable("id") Integer id, @RequestParam(value = "includeReview", required = false) boolean includeReview, @RequestParam(value = "pageNum", required = true) Integer pageNum, @RequestParam(value = "numElements", required = true) Integer numElements ) throws ResourceNotFoundException{
         Product product = productService.findById(id);
-        Collection<ReviewDto> reviewDtos = new ArrayList<>();
+        Collection<ReviewObjectDto> reviewObjectDtos = new ArrayList<>();
         if(includeReview == true) {
             logger.info("Required to get Reviews for the product as well");
-            reviewDtos.addAll(productService.getReviewsForProduct(product.getProductId(), pageNum, numElements));
+            reviewObjectDtos.addAll(productService.getReviewsForProduct(product.getProductId(), pageNum, numElements));
         }
-        return new ResponseEntity(convertToProductDto(product,reviewDtos), HttpStatus.OK);
+        return new ResponseEntity(convertToProductDto(product,reviewObjectDtos), HttpStatus.OK);
     }
 
     /**
@@ -85,11 +88,10 @@ public class ProductsController {
 
     }
 
-    private ProductDto convertToProductDto(Product product, Collection<ReviewDto> reviewDtos){
+    private ProductDto convertToProductDto(Product product, Collection<ReviewObjectDto> reviewObjectDtos){
         ProductDto productDto = modelMapper.map(product, ProductDto.class);
-        if(reviewDtos != null && !reviewDtos.isEmpty()){
-            productDto.setReviewDtos(reviewDtos);
-        }
+        if(reviewObjectDtos != null && !reviewObjectDtos.isEmpty())
+            productDto.setReviewObjectDtos(reviewObjectDtos);
         return productDto;
     }
 

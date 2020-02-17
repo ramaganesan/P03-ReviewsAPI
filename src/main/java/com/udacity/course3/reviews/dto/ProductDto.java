@@ -27,7 +27,7 @@ public class ProductDto {
 
     private LocalDateTime updateDate;
 
-    private Collection<ReviewDto> reviewDtos;
+    private Collection<ReviewObjectDto> reviewObjectDtos;
 
 
 }

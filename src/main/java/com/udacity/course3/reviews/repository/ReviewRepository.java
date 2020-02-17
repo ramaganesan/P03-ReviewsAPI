@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Collection;
 import java.util.List;
 
-@Repository
+@Repository("entiryReviewRepository")
 public interface ReviewRepository extends PagingAndSortingRepository<Review, Integer> {
 
     List<Review> findByProductProductId(Integer productId, Pageable pageable);
