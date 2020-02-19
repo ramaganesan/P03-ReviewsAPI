@@ -46,7 +46,7 @@ Run of the ReviewsApplication will also use flyway to create the schema
 ```
 
 Endpoints:
-* http://localhost:8080/swagger-ui/index.html
+* http://localhost:8080/swagger-ui/index.html?url=/v3/api-docs&validatorUrl=
 
 Sample Payload
 ```
