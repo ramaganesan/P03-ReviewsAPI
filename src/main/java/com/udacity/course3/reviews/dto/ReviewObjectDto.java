@@ -1,11 +1,13 @@
 package com.udacity.course3.reviews.dto;
 
+import com.udacity.course3.reviews.document.CommentDocument;
 import com.udacity.course3.reviews.domain.RatingsEnum;
 import lombok.*;
 import org.bson.types.ObjectId;
 
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -35,5 +37,6 @@ public class ReviewObjectDto {
 
     private LocalDateTime updateDate;
 
+    private List<CommentDocument> commentDocuments;
 
 }

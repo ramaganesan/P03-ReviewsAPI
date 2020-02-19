@@ -4,9 +4,7 @@ import com.udacity.course3.reviews.document.CommentDocument;
 import com.udacity.course3.reviews.document.ReviewDocument;
 import com.udacity.course3.reviews.domain.Comment;
 import com.udacity.course3.reviews.domain.Review;
-import com.udacity.course3.reviews.dto.CommentDto;
-import com.udacity.course3.reviews.dto.ReviewDto;
-import com.udacity.course3.reviews.dto.ReviewObjectDto;
+import com.udacity.course3.reviews.dto.*;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 
@@ -40,7 +38,7 @@ public class ReviewApplicationUtils {
     public static void convertCommentDocumnetsToCommentDTO(Collection<CommentDocument> commentDocuments, Collection<CommentDto> commentDtos, ModelMapper modelMapper){
         if (commentDocuments != null && !commentDocuments.isEmpty()){
             Type commentDtoObjectType = new TypeToken<Collection<CommentDto>>(){}.getType();
-            commentDtos.addAll(modelMapper.map(commentDtos,commentDtoObjectType));
+            commentDtos.addAll(modelMapper.map(commentDocuments,commentDtoObjectType));
         }
     }
 
@@ -63,4 +61,13 @@ public class ReviewApplicationUtils {
     public static CommentDocument convertCommentDtoToCommentDocument(CommentDto commentDto, ModelMapper modelMapper){
         return modelMapper.map(commentDto,CommentDocument.class);
     }
+
+    public static CommentDocument convertCommentUpVoteDtoToCommentDocument(CommentUpVoteDto commentUpVoteDto, ModelMapper modelMapper){
+        return modelMapper.map(commentUpVoteDto,CommentDocument.class);
+    }
+
+    public static CommentDocument convertCommentDownVoteDtoToCommentDocument(CommentDownVoteDto commentDownVoteDto, ModelMapper modelMapper){
+        return modelMapper.map(commentDownVoteDto,CommentDocument.class);
+    }
 }
+

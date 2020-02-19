@@ -83,7 +83,7 @@ public class ReviewRepositoryTest {
         commentDocument = optionalReviewDocument.get().getCommentDocuments().get(0);
         assertThat(commentDocument.get_id().toString()).isNotNull();
         commentDocument.setUpvoteCount(commentDocument.getUpvoteCount() + 1);
-        long updateCount = mongoReviewRepository.updateCommentDocument(commentDocument);
+        long updateCount = mongoReviewRepository.updateCommentDocumentUpVote(commentDocument);
         assertThat(updateCount).isEqualTo(1l);
 
 

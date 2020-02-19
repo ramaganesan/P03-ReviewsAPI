@@ -1,6 +1,5 @@
 package com.udacity.course3.reviews.service;
 
-import com.udacity.course3.reviews.controller.ReviewsController;
 import com.udacity.course3.reviews.document.CommentDocument;
 import com.udacity.course3.reviews.document.ReviewDocument;
 import com.udacity.course3.reviews.domain.Product;
@@ -12,16 +11,13 @@ import com.udacity.course3.reviews.repository.ReviewRepository;
 import com.udacity.course3.reviews.utils.ReviewApplicationUtils;
 import org.bson.types.ObjectId;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 
-import java.lang.reflect.Type;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -103,7 +99,7 @@ public class ReviewService {
      * @param reviewId Object Id
      * @return The Review with Comments or 404 if Review is not found. We
      */
-    public ReviewDocument createCommentForReview(ObjectId reviewId, CommentDocument commentDocument){
+    public ReviewObjectDto createCommentForReview(ObjectId reviewId, CommentDocument commentDocument){
         Optional<ReviewDocument> reviewDocumentOptional = mongoReviewRepository.findById(reviewId);
         ReviewDocument reviewDocument = reviewDocumentOptional.orElseThrow(() -> new ResourceNotFoundException("No Reviews found for id" + reviewId));
         commentDocument.set_id(new ObjectId());
@@ -111,7 +107,7 @@ public class ReviewService {
         commentDocument.setUpdateDate(LocalDateTime.now());
         reviewDocument.addComment(commentDocument);
         mongoReviewRepository.save(reviewDocument);
-        return reviewDocument;
+        return ReviewApplicationUtils.convertReviewDocumentToReviewObjectDto(reviewDocument,modelMapper);
 
     }
 
@@ -131,8 +127,16 @@ public class ReviewService {
      * @param commentDocument
      * @return Updated CommentDocument
      */
-    public long updateCommentDocument(CommentDocument commentDocument){
-        long updateCount = mongoReviewRepository.updateCommentDocument(commentDocument);
+    public long updateCommentDocumentUpVote(CommentDocument commentDocument){
+        long updateCount = mongoReviewRepository.updateCommentDocumentUpVote(commentDocument);
+        return updateCount;
+    }/**
+     *
+     * @param commentDocument
+     * @return Updated CommentDocument
+     */
+    public long updateCommentDocumentDownVote(CommentDocument commentDocument){
+        long updateCount = mongoReviewRepository.updateCommentDocumentDownVote(commentDocument);
         return updateCount;
     }
 

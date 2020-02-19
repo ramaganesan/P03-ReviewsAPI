@@ -22,11 +22,19 @@ public class ReviewRepositoryCommentImpl implements ReviewRepositoryComment {
     }
 
     @Override
-    public long updateCommentDocument(CommentDocument commentDocument) {
+    public long updateCommentDocumentUpVote(CommentDocument commentDocument) {
+        return createQuery(commentDocument, "comments.$.upvoteCount", commentDocument.getUpvoteCount());
+    }
+
+    @Override
+    public long updateCommentDocumentDownVote(CommentDocument commentDocument) {
+        return createQuery(commentDocument, "comments.$.downVoteCount", commentDocument.getDownVoteCount());
+    }
+
+    private long createQuery(CommentDocument commentDocument, String s, int downVoteCount) {
         Query query = new Query(Criteria.where("comments._id").is(commentDocument.get_id()));
         Update update = new Update();
-        update.set("comments.$.upvoteCount",commentDocument.getUpvoteCount());
-        update.set("comments.$.downVoteCount",commentDocument.getDownVoteCount());
+        update.inc(s, downVoteCount);
         update.set("comments.$.updateDate", LocalDateTime.now());
         UpdateResult result = mongoTemplate.updateFirst(query,update, ReviewDocument.class);
         return result.getModifiedCount();

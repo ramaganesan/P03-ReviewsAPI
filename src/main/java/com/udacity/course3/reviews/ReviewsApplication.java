@@ -2,7 +2,9 @@ package com.udacity.course3.reviews;
 
 import com.udacity.course3.reviews.configuration.JPAConfiguration;
 import com.udacity.course3.reviews.configuration.MongoDBConfiguration;
+import com.udacity.course3.reviews.document.CommentDocument;
 import com.udacity.course3.reviews.document.ReviewDocument;
+import com.udacity.course3.reviews.dto.CommentDto;
 import com.udacity.course3.reviews.dto.ReviewObjectDto;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeMap;
@@ -13,10 +15,7 @@ import org.springframework.boot.autoconfigure.data.mongo.MongoRepositoriesAutoCo
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 
-@SpringBootApplication(
-		exclude = {MongoRepositoriesAutoConfiguration.class, JpaRepositoriesAutoConfiguration.class}
-)
-@Import({JPAConfiguration.class, MongoDBConfiguration.class})
+@SpringBootApplication
 public class ReviewsApplication {
 
 	public static void main(String[] args) {
@@ -30,6 +29,9 @@ public class ReviewsApplication {
 		reviewDocumentReviewObjectDtoTypeMap.addMapping( reviewDocument-> reviewDocument.get_id(), ReviewObjectDto::set_id);
 		reviewDocumentReviewObjectDtoTypeMap.addMapping(reviewDocument -> reviewDocument.getReviewRating(),ReviewObjectDto::setReviewRating);
 		reviewDocumentReviewObjectDtoTypeMap.addMapping(reviewDocument -> 0, ReviewObjectDto::setReviewId);
+
+		TypeMap<CommentDocument, CommentDto> commentDocumentCommentDtoTypeMap = modelMapper.createTypeMap(CommentDocument.class,CommentDto.class);
+		commentDocumentCommentDtoTypeMap.addMapping(commentDocument -> commentDocument.get_id(),CommentDto::setCommentId);
 
 		return modelMapper;
 	}

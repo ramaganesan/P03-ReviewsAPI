@@ -1,27 +1,28 @@
 # Reviews API 
 Supports operations for writing reviews and listing reviews for a product but with no sorting or filtering.
+The API also support Paging.
+This API was built on top of the Reviews that was build using MySQL. This API can satisfy the following functionality.
+
+* Support CRUD Operations on Product. The Product data will be store in MySQL Repository
+* Suppport Read Operation on Reviews. The API will get data from both MySQL Repository
+and MongoDB Repository
+* Support CU of a Review. All new Reviews will be created in the Mongo Repository.
+* Support CRU of Comments to a Review. All Comments will be stored as a embedded document with Review
+in the Mongo Repository
+* Support upVoting and downVoting a comment as well
 
 ### Prerequisites
-MySQL needs to be installed and configured. Instructions provided separately.
+* MySQL needs to be installed and configured. It also assumes that Review and Comment table is available in 
+the MySQL repository. Can provide access to MySQL repository if needed.
+* API assumes that MongoDB cluster is created and DB user properly set up. Can provide access to
+MongoDB cluster if needed
 
 ### Getting Started
-* Configure the MySQL Datasource in application.properties.
-* Add Flyway scripts in src/main/resources/db/migration.
-* Define JPA Entities and relationships.
-* Define Spring Data JPA Repositories.
-* Add tests for JPA Repositories.
-
-### Reference Documentation
-For further reference, please consider the following sections:
-
-* [Official Apache Maven documentation](https://maven.apache.org/guides/index.html)
-
-### Guides
-The following guides illustrate how to use some features concretely:
-
-* [Accessing JPA Data with REST](https://spring.io/guides/gs/accessing-data-rest/)
-* [Accessing Data with JPA](https://spring.io/guides/gs/accessing-data-jpa/)
-* [Accessing data with MySQL](https://spring.io/guides/gs/accessing-data-mysql/)
+* Check out the code from Git
+* Set up the datasource configuration, will be provided to the evaluator
+* Build the project
+* Flyway scripts available in src/main/resources/db/migration.
+* Run the application
 
 ###Developer Notes
 Schema Help: 
@@ -49,7 +50,7 @@ Endpoints:
 
 Sample Payload
 ```
-Create new Product
+Create new Product:
 POST http://localhost:8080/products/:
 {
 	"name" : "UdacityShampoo",
@@ -62,7 +63,8 @@ POST http://localhost:8080/products/:
         "description": "UdacityConditionerDescription",
         "image": "www.UdacityConditioner.com"
     }
-Create New Review
+
+Create New Review:
 POST http://localhost:8080/reviews/products/{productId}
 {
 	"name" : "UdacityShampooReview",
@@ -80,7 +82,8 @@ POST http://localhost:8080/reviews/products/{productId}
 	"reviewRating" : 1
 }
 Note: Review Rating 0(POOR), 1(GOOD), 2(EXCELLENT)
-Create new Comment
+
+Create new Comment:
 POST http://localhost:8080/comments/reviews/{reviewId}
 {
     "commentBody": "GoodReview",
@@ -93,6 +96,31 @@ POST http://localhost:8080/comments/reviews/{reviewId}
 	"upvoteCount" : 0,
 	"downVoteCount" : 0
 }
+reviewId => Must be Object Id from MongoDB
+e.g http://localhost:8080/comments/reviews/5e482a55d04f991e9cb301bb
+5e482a55d04f991e9cb301bb here is Object Id from MongoDB
+
+UpVote a Comment:
+PATCH http://localhost:8080/comments/{commentId}/upvote
+{
+  {
+  	"upvoteCount": 4
+  }
+}
+commentId => Must be Object Id of Embedded Comment Document within Review
+e.g http://localhost:8080/comments/5e482a9fd04f991e9cb301bc/upvote
+5e482a9fd04f991e9cb301bc here is the Object Id of Comment with Review
+
+DownVote a Comment:
+PATCH http://localhost:8080/comments/{commentId}/downvote
+{
+  {
+  	"downvoteCount": 4
+  }
+}
+commentId => Must be Object Id of Embedded Comment Document within Review
+e.g http://localhost:8080/comments/5e482a9fd04f991e9cb301bc/downvote
+5e482a9fd04f991e9cb301bc here is the Object Id of Comment with Review
 ```
              
 

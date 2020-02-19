@@ -5,7 +5,9 @@ import org.bson.types.ObjectId;
 
 public interface ReviewRepositoryComment {
 
-    public long updateCommentDocument(CommentDocument commentDocument);
+    public long updateCommentDocumentUpVote(CommentDocument commentDocument);
+
+    public long updateCommentDocumentDownVote(CommentDocument commentDocument);
 
     public CommentDocument addCommentToReview(CommentDocument commentDocument, ObjectId reviewId);
 }

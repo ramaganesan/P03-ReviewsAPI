@@ -9,5 +9,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @Configuration
 @EnableJpaAuditing
 @EnableJpaRepositories(basePackages = "com.udacity.course3.reviews.repository")
+@EntityScan("com.udacity.course3.reviews.domain")
 public class JPAConfiguration {
 }

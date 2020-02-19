@@ -1,5 +1,6 @@
 package com.udacity.course3.reviews.repository;
 
+import com.udacity.course3.reviews.configuration.JPAConfiguration;
 import com.udacity.course3.reviews.domain.Product;
 import com.udacity.course3.reviews.exception.ResourceNotFoundException;
 import com.udacity.course3.reviews.utils.TestUtils;
@@ -8,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -21,7 +23,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @DataJpaTest(showSql = true)
 @TestPropertySource("classpath:application-test.properties")
 @Sql("/productTestLoad.sql")
-
+@ContextConfiguration(classes = {JPAConfiguration.class})
 public class ProductRepositoryTest {
 
 
