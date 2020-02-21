@@ -16,9 +16,11 @@ import java.util.List;
 @Builder
 public class ReviewObjectDto {
 
+    private String _id;
+
     private Integer reviewId;
 
-    private String _id;
+    private Integer productId;
 
     private RatingsEnum reviewRating;
 

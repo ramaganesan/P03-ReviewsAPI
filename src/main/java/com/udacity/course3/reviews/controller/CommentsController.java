@@ -54,9 +54,9 @@ public class CommentsController {
      * @param reviewId The id of the review.
      */
     @RequestMapping(value = "/reviews/{reviewId}", method = RequestMethod.POST)
-    public ResponseEntity<?> createCommentForReview(@PathVariable("reviewId") ObjectId reviewId, @Valid @RequestBody CommentDto commentDto) {
-        CommentDocument commentDocument = ReviewApplicationUtils.convertCommentDtoToCommentDocument(commentDto,modelMapper);
-        ReviewObjectDto reviewObjectDto = reviewService.createCommentForReview(reviewId,commentDocument);
+    public ResponseEntity<?> createCommentForReview(@PathVariable("reviewId") Integer reviewId, @Valid @RequestBody CommentDto commentDto) {
+
+        ReviewObjectDto reviewObjectDto = reviewService.createCommmentsForReviewInRepositories(reviewId,commentDto);
         return new ResponseEntity<>(reviewObjectDto,HttpStatus.CREATED);
     }
 
@@ -70,8 +70,8 @@ public class CommentsController {
      * @param reviewId The Objectid of the review.
      */
     @RequestMapping(value = "/reviews/{reviewId}", method = RequestMethod.GET)
-    public ResponseEntity<?> listCommentsForReview(@PathVariable("reviewId") String reviewId) {
-        ReviewDocument reviewDocument = reviewService.findReviewDocument(new ObjectId(reviewId));
+    public ResponseEntity<?> listCommentsForReview(@PathVariable("reviewId") Integer reviewId) {
+        ReviewDocument reviewDocument = reviewService.findReviewDocument(reviewId);
         Collection<CommentDto> commentDtos = new ArrayList<>();
         ReviewApplicationUtils.convertCommentDocumnetsToCommentDTO(reviewDocument.getCommentDocuments(),commentDtos,modelMapper);
         return new ResponseEntity(commentDtos,HttpStatus.OK);
@@ -84,10 +84,9 @@ public class CommentsController {
      * @return HttpStatus
      */
     @RequestMapping(value = "/{commentId}/upvote", method = RequestMethod.PATCH)
-    public ResponseEntity<?> upvoteComments(@PathVariable("commentId") String commentId,  @RequestBody CommentUpVoteDto commentUpVoteDto){
-        CommentDocument commentDocument = ReviewApplicationUtils.convertCommentUpVoteDtoToCommentDocument(commentUpVoteDto,modelMapper);
-        commentDocument.set_id(new ObjectId(commentId));
-        reviewService.updateCommentDocumentUpVote(commentDocument);
+    public ResponseEntity<?> upvoteComments(@PathVariable("commentId") Integer commentId,  @RequestBody CommentUpVoteDto commentUpVoteDto){
+
+        reviewService.updateCommentDocumentUpVote(commentUpVoteDto,commentId);
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
@@ -98,10 +97,9 @@ public class CommentsController {
      * @return HttpStatus
      */
     @RequestMapping(value = "/{commentId}/downvote", method = RequestMethod.PATCH)
-    public ResponseEntity<?> downvoteComments(@PathVariable("commentId") String commentId, @RequestBody CommentDownVoteDto commentDownVoteDto){
-        CommentDocument commentDocument = ReviewApplicationUtils.convertCommentDownVoteDtoToCommentDocument(commentDownVoteDto,modelMapper);
-        commentDocument.set_id(new ObjectId(commentId));
-        reviewService.updateCommentDocumentDownVote(commentDocument);
+    public ResponseEntity<?> downvoteComments(@PathVariable("commentId") Integer commentId, @RequestBody CommentDownVoteDto commentDownVoteDto){
+
+        reviewService.updateCommentDocumentDownVote(commentDownVoteDto,commentId);
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 

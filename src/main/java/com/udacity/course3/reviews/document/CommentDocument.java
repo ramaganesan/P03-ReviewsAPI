@@ -17,8 +17,10 @@ import java.time.LocalDateTime;
 @Builder
 public class CommentDocument {
 
-    @Id
+   @Id
     private ObjectId _id;
+
+    private Integer commentId;
 
     private String commentBody;
 

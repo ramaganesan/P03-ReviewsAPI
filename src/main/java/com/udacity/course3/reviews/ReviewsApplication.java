@@ -2,6 +2,7 @@ package com.udacity.course3.reviews;
 
 import com.udacity.course3.reviews.document.CommentDocument;
 import com.udacity.course3.reviews.document.ReviewDocument;
+import com.udacity.course3.reviews.domain.Comment;
 import com.udacity.course3.reviews.dto.CommentDto;
 import com.udacity.course3.reviews.dto.ReviewObjectDto;
 import org.modelmapper.ModelMapper;
@@ -23,10 +24,14 @@ public class ReviewsApplication {
 		TypeMap<ReviewDocument, ReviewObjectDto> reviewDocumentReviewObjectDtoTypeMap = modelMapper.createTypeMap(ReviewDocument.class,ReviewObjectDto.class);
 		reviewDocumentReviewObjectDtoTypeMap.addMapping( reviewDocument-> reviewDocument.get_id(), ReviewObjectDto::set_id);
 		reviewDocumentReviewObjectDtoTypeMap.addMapping(reviewDocument -> reviewDocument.getReviewRating(),ReviewObjectDto::setReviewRating);
-		reviewDocumentReviewObjectDtoTypeMap.addMapping(reviewDocument -> 0, ReviewObjectDto::setReviewId);
+
 
 		TypeMap<CommentDocument, CommentDto> commentDocumentCommentDtoTypeMap = modelMapper.createTypeMap(CommentDocument.class,CommentDto.class);
-		commentDocumentCommentDtoTypeMap.addMapping(commentDocument -> commentDocument.get_id(),CommentDto::setCommentId);
+		commentDocumentCommentDtoTypeMap.addMapping(commentDocument -> commentDocument.get_id(),CommentDto::set_id);
+		commentDocumentCommentDtoTypeMap.addMapping(commentDocument -> commentDocument.getCommentId(),CommentDto::setCommentId);
+
+		TypeMap<CommentDto, Comment> commentDtoCommentTypeMap = modelMapper.createTypeMap(CommentDto.class, Comment.class);
+		commentDtoCommentTypeMap.addMappings(modelMapper1 -> modelMapper1.skip(Comment::setCommentId));
 
 		return modelMapper;
 	}

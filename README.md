@@ -3,11 +3,11 @@ Supports operations for writing reviews and listing reviews for a product but wi
 The API also support Paging.
 This API was built on top of the Reviews that was build using MySQL. This API can satisfy the following functionality.
 
-* Support CRUD Operations on Product. The Product data will be store in MySQL Repository
-* Suppport Read Operation on Reviews. The API will get data from both MySQL Repository
-and MongoDB Repository
-* Support CU of a Review. All new Reviews will be created in the Mongo Repository.
-* Support CRU of Comments to a Review. All Comments will be stored as a embedded document with Review
+* Support CR Operations on Product. The Product data will be store in MySQL Repository
+* Suppport Read Operation on Reviews. The API will get data from MongoDB Repository
+* Support CU of a Review. All new Reviews will be created  first created in MySql Repository and 
+Mongo Repository.
+* Support CRU of Comments to a Review. All Comments will be stored in MySql Repository  and as a embedded document with Review
 in the Mongo Repository
 * Support upVoting and downVoting a comment as well
 
@@ -96,9 +96,9 @@ POST http://localhost:8080/comments/reviews/{reviewId}
 	"upvoteCount" : 0,
 	"downVoteCount" : 0
 }
-reviewId => Must be Object Id from MongoDB
-e.g http://localhost:8080/comments/reviews/5e482a55d04f991e9cb301bb
-5e482a55d04f991e9cb301bb here is Object Id from MongoDB
+reviewId => Must be reviewId from MySQL or MongoDB
+e.g http://localhost:8080/comments/reviews/10
+10 here is Review Id from MongoDB or Mysql
 
 UpVote a Comment:
 PATCH http://localhost:8080/comments/{commentId}/upvote
@@ -107,9 +107,10 @@ PATCH http://localhost:8080/comments/{commentId}/upvote
   	"upvoteCount": 4
   }
 }
-commentId => Must be Object Id of Embedded Comment Document within Review
-e.g http://localhost:8080/comments/5e482a9fd04f991e9cb301bc/upvote
-5e482a9fd04f991e9cb301bc here is the Object Id of Comment with Review
+commentId => Must be Comment Id of Embedded Comment Document within Review or Comment Table
+from MySQL
+e.g http://localhost:8080/comments/10/upvote
+10 here is the Comment Id of Comment with Review
 
 DownVote a Comment:
 PATCH http://localhost:8080/comments/{commentId}/downvote
@@ -118,9 +119,10 @@ PATCH http://localhost:8080/comments/{commentId}/downvote
   	"downvoteCount": 4
   }
 }
-commentId => Must be Object Id of Embedded Comment Document within Review
-e.g http://localhost:8080/comments/5e482a9fd04f991e9cb301bc/downvote
-5e482a9fd04f991e9cb301bc here is the Object Id of Comment with Review
+commentId => Must be Comment Id of Embedded Comment Document within Review or Comment Table
+from MySQL
+e.g http://localhost:8080/comments/10/upvote
+10 here is the Comment Id of Comment with Review
 ```
              
 

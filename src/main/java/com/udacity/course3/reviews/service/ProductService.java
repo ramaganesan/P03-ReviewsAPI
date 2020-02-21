@@ -55,9 +55,9 @@ public class ProductService {
 
     public Collection<ReviewObjectDto> getReviewsForProduct(Integer productId, Integer pageNum, Integer numElements){
         Pageable pageable = PageRequest.of(pageNum,numElements);
-        Collection<ReviewObjectDto> reviewObjectDtos = new ArrayList<>();
-        List<ReviewDto> reviewDtos = productRepository.getReviewsForProduct(productId,pageable);
-        ReviewApplicationUtils.convertReviewObjectsToReviewObjectsDTO(reviewObjectDtos,reviewDtos,modelMapper);
+         Collection<ReviewObjectDto> reviewObjectDtos = new ArrayList<>();
+         /*List<ReviewDto> reviewDtos = productRepository.getReviewsForProduct(productId,pageable);
+        ReviewApplicationUtils.convertReviewObjectsToReviewObjectsDTO(reviewObjectDtos,reviewDtos,modelMapper);*/
         List<ReviewDocument> reviewDocuments = mongoReviewRepository.findReviewDocumentByProductId(productId,pageable);
         ReviewApplicationUtils.convertReviewDocumentsToReviewObjectsDTO(reviewObjectDtos,reviewDocuments,modelMapper);
         return reviewObjectDtos;

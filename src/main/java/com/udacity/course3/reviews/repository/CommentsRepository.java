@@ -9,4 +9,5 @@ import java.util.Collection;
 public interface CommentsRepository extends CrudRepository<Comment, Integer> {
 
     Collection<Comment> findByReviewReviewId(Integer reviewId);
+
 }

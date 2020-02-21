@@ -5,6 +5,7 @@ import com.udacity.course3.reviews.document.ReviewDocument;
 import com.udacity.course3.reviews.domain.Comment;
 import com.udacity.course3.reviews.domain.Review;
 import com.udacity.course3.reviews.dto.*;
+import org.bson.types.ObjectId;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 
@@ -42,7 +43,7 @@ public class ReviewApplicationUtils {
         }
     }
 
-    public static ReviewDocument convertReviewObjectDtosToReviewDocument(ReviewObjectDto reviewObjectDto, ModelMapper modelMapper){
+    public static ReviewDocument convertReviewObjectDtoToReviewDocument(ReviewObjectDto reviewObjectDto, ModelMapper modelMapper){
         return  modelMapper.map(reviewObjectDto,ReviewDocument.class);
     }
 
@@ -50,8 +51,16 @@ public class ReviewApplicationUtils {
         return modelMapper.map(reviewDocument,ReviewObjectDto.class);
     }
 
+    public static Review convertReviewObjectDtoToReview(ReviewObjectDto reviewObjectDto, ModelMapper modelMapper){
+        return modelMapper.map(reviewObjectDto,Review.class);
+    }
+
     public static CommentDto convertCommentToCommentDTO(Comment comment, ModelMapper modelMapper){
         return modelMapper.map(comment,CommentDto.class);
+    }
+
+    public static Comment convertCommentDtoToComment(CommentDto commentDto, ModelMapper modelMapper){
+        return modelMapper.map(commentDto,Comment.class);
     }
 
     public static CommentDto convertCommentDocumentToCommentDTO(CommentDocument commentDocument, ModelMapper modelMapper){
@@ -68,6 +77,23 @@ public class ReviewApplicationUtils {
 
     public static CommentDocument convertCommentDownVoteDtoToCommentDocument(CommentDownVoteDto commentDownVoteDto, ModelMapper modelMapper){
         return modelMapper.map(commentDownVoteDto,CommentDocument.class);
+    }
+
+    public static ReviewDocument convertReviewToReviewDocument(Review review, ModelMapper modelMapper){
+        ReviewDocument reviewDocument = modelMapper.map(review, ReviewDocument.class);
+
+        return reviewDocument;
+    }
+
+    public static CommentDocument getCommentDocumentFromComment(Comment comment) {
+        return CommentDocument.builder().commentId(comment.getCommentId())
+                        .commentBody(comment.getCommentBody())
+                        .upvoteCount(comment.getUpvoteCount())
+                        .downVoteCount(comment.getDownVoteCount())
+                        .createDate(comment.getCreateDate())
+                        .updateDate(comment.getUpdateDate())
+                        ._id(new ObjectId())
+                        .build();
     }
 }
 

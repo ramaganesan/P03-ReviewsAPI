@@ -8,16 +8,27 @@ import com.udacity.course3.reviews.domain.RatingsEnum;
 import com.udacity.course3.reviews.domain.Review;
 import org.bson.types.ObjectId;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import java.util.concurrent.atomic.AtomicInteger;
+
 public class TestUtils {
+
+    private static final AtomicInteger counter = new AtomicInteger(0);
+
+    public static Integer getNextNumber(){
+        return counter.incrementAndGet();
+    }
 
     public static ReviewDocument createReviewDocument(Integer productId, RatingsEnum ratingsEnum, String name, String reviewBody, String author, String publisher){
         ReviewDocument reviewDocument = ReviewDocument.builder().productId(productId).reviewRating(ratingsEnum).name(name).reviewBody(reviewBody)
                 .author(author).publisher(publisher).build();
+        reviewDocument.setReviewId(getNextNumber());
         return reviewDocument;
     }
 
-    public static CommentDocument createCommentsForReview(String commentBody, Integer upvoteCount, Integer downVoteCount){
-        CommentDocument commentDocument = CommentDocument.builder().commentBody(commentBody).upvoteCount(upvoteCount).downVoteCount(downVoteCount)._id(new ObjectId()).build();
+    public static CommentDocument createCommentsForReview(String commentBody, Integer upvoteCount, Integer downVoteCount,Integer commentId){
+        CommentDocument commentDocument = CommentDocument.builder().commentBody(commentBody).upvoteCount(upvoteCount).
+                downVoteCount(downVoteCount).commentId(commentId)._id(new ObjectId()).build();
         return  commentDocument;
     }
 

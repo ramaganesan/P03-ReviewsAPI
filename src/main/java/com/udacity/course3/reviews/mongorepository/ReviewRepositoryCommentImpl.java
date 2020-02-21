@@ -32,7 +32,7 @@ public class ReviewRepositoryCommentImpl implements ReviewRepositoryComment {
     }
 
     private long createQuery(CommentDocument commentDocument, String s, int downVoteCount) {
-        Query query = new Query(Criteria.where("comments._id").is(commentDocument.get_id()));
+        Query query = new Query(Criteria.where("comments.commentId").is(commentDocument.getCommentId()));
         Update update = new Update();
         update.inc(s, downVoteCount);
         update.set("comments.$.updateDate", LocalDateTime.now());
@@ -41,14 +41,14 @@ public class ReviewRepositoryCommentImpl implements ReviewRepositoryComment {
     }
 
     @Override
-    public CommentDocument addCommentToReview(CommentDocument commentDocument, ObjectId reviewId) {
-        Query query = new Query(Criteria.where("_id").is(reviewId));
+    public ReviewDocument addCommentToReview(CommentDocument commentDocument, Integer reviewId) {
+        Query query = new Query(Criteria.where("reviewId").is(reviewId));
         ReviewDocument reviewDocument = mongoTemplate.findOne(query,ReviewDocument.class);
         if(reviewDocument != null){
             reviewDocument.addComment(commentDocument);
-            mongoTemplate.save(reviewDocument);
+            reviewDocument = mongoTemplate.save(reviewDocument);
         }
-        return commentDocument;
+        return reviewDocument;
     }
 
 

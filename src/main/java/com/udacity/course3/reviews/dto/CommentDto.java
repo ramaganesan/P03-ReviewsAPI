@@ -13,7 +13,9 @@ import java.time.LocalDateTime;
 @Builder
 public class CommentDto {
 
-    private String commentId;
+    private String _id;
+
+    private int commentId;
 
     @NotBlank(message = "CommentBody is mandatory")
     private String commentBody;

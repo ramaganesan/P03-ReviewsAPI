@@ -1,14 +1,17 @@
 package com.udacity.course3.reviews.mongorepository;
 
+import com.mongodb.MongoWriteException;
 import com.udacity.course3.reviews.document.CommentDocument;
 import com.udacity.course3.reviews.document.ReviewDocument;
 import com.udacity.course3.reviews.domain.RatingsEnum;
 import com.udacity.course3.reviews.utils.TestUtils;
 import org.bson.types.ObjectId;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
@@ -26,7 +29,7 @@ public class ReviewRepositoryTest {
         this.mongoReviewRepository = mongoReviewRepository;
     }
 
-    @BeforeEach
+
     void init(){
         ReviewDocument reviewDocument = TestUtils.createReviewDocument(1,RatingsEnum.GOOD,"UdacityMangoConditionerPlusShampooGoodreview","Good product"
                                                             ,"self","udacity");
@@ -56,10 +59,37 @@ public class ReviewRepositoryTest {
     }
 
     @Test
+    void findReviewByReviewId(){
+        Integer productId = 1;
+        ReviewDocument reviewDocument = TestUtils.createReviewDocument(productId,RatingsEnum.EXCELLENT,"UdacityMangoConditionerPlusShampooExcellentReview","Excellent product"
+                ,"self","udacity");
+        reviewDocument = mongoReviewRepository.save(reviewDocument);
+        Optional<ReviewDocument> optionalReviewDocument = mongoReviewRepository.findReviewDocumentByReviewId(reviewDocument.getReviewId());
+        reviewDocument = optionalReviewDocument.get();
+        assertThat(reviewDocument).isNotNull();
+    }
+
+    @Test()
+    void testUniqueReviewIds() {
+        Integer productId = 1;
+        Integer reviewInteger = 1;
+        ReviewDocument reviewDocument = TestUtils.createReviewDocument(productId,RatingsEnum.EXCELLENT,"UdacityMangoConditionerPlusShampooExcellentReview","Excellent product"
+                ,"self","udacity");
+        ReviewDocument reviewDocument1 = TestUtils.createReviewDocument(productId,RatingsEnum.EXCELLENT,"UdacityMangoConditionerPlusShampooExcellentReview","Excellent product"
+                ,"self","udacity");
+        reviewDocument1.setReviewId(reviewDocument.getReviewId());
+        mongoReviewRepository.save(reviewDocument);
+        DuplicateKeyException duplicateKeyException = Assertions.assertThrows(DuplicateKeyException.class, () -> {
+            mongoReviewRepository.save(reviewDocument1);
+        });
+
+    }
+
+    @Test
     void saveReviewWithComments(){
         ReviewDocument reviewDocument = TestUtils.createReviewDocument(1,RatingsEnum.EXCELLENT,"UdacityMangoConditionerPlusShampooExcellentReview","Excellent product"
                 ,"self","udacity");
-        CommentDocument commentDocument = TestUtils.createCommentsForReview("good review brother", 0, 0);
+        CommentDocument commentDocument = TestUtils.createCommentsForReview("good review brother", 0, 0,1);
         reviewDocument.addComment(commentDocument);
         reviewDocument = mongoReviewRepository.save(reviewDocument);
         Optional<ReviewDocument> optionalReviewDocument = mongoReviewRepository.findById(reviewDocument.get_id());
@@ -74,7 +104,7 @@ public class ReviewRepositoryTest {
     void updateCommentsUpVoteCount(){
         ReviewDocument reviewDocument = TestUtils.createReviewDocument(1,RatingsEnum.EXCELLENT,"UdacityMangoConditionerPlusShampooExcellentReview","Excellent product"
                 ,"self","udacity");
-        CommentDocument commentDocument = TestUtils.createCommentsForReview("good review brother", 0, 0);
+        CommentDocument commentDocument = TestUtils.createCommentsForReview("good review brother", 0, 0,1);
         reviewDocument.addComment(commentDocument);
         reviewDocument = mongoReviewRepository.save(reviewDocument);
         Optional<ReviewDocument> optionalReviewDocument = mongoReviewRepository.findById(reviewDocument.get_id());

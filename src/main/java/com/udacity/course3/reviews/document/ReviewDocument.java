@@ -32,11 +32,13 @@ public class ReviewDocument {
     @Id
     private ObjectId _id;
 
+    @Indexed(unique = true)
+    private int reviewId;
+
     @Indexed(name = "productId_1")
     private int productId;
 
     @Indexed(name = "reviewRating_1")
-
     private RatingsEnum reviewRating;
 
     private String name;

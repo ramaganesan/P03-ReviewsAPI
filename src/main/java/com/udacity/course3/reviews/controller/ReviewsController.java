@@ -60,12 +60,9 @@ public class ReviewsController {
      * @return The created review or 404 if product id is not found.
      */
     @RequestMapping(value = "/reviews/products/{productId}", method = RequestMethod.POST)
-    public ResponseEntity<?> createReviewForProduct(@PathVariable("productId") Integer productId,@Valid @RequestBody ReviewObjectDto reviewObjectDto) {
-
-        ReviewDocument reviewDocument = ReviewApplicationUtils.convertReviewObjectDtosToReviewDocument(reviewObjectDto,modelMapper);
-
-        reviewDocument = reviewService.createReviewDocumentForProduct(productId,reviewDocument);
-        return new ResponseEntity<>(ReviewApplicationUtils.convertReviewDocumentToReviewObjectDto(reviewDocument,modelMapper),HttpStatus.CREATED);
+    public ResponseEntity<?> createReviewForProduct(@PathVariable("productId") Integer productId,@Valid @RequestBody ReviewObjectDto reviewObjectDto)  {
+        reviewObjectDto = reviewService.createReviewForProductInRepositories(productId,reviewObjectDto);
+        return new ResponseEntity<>(reviewObjectDto,HttpStatus.CREATED);
 
     }
 
@@ -80,16 +77,5 @@ public class ReviewsController {
         Collection<ReviewObjectDto> reviewObjectDtos = reviewService.listReviewsForProduct(productId, pageNum, numElements);
         return new ResponseEntity<>(reviewObjectDtos,HttpStatus.OK);
     }
-
-    private Review convertToReview(ReviewObjectDto reviewObjectDto){
-        return modelMapper.map(reviewObjectDto, Review.class);
-    }
-
-    private ReviewObjectDto convertToReviewObjectDto(Review review){
-        ReviewObjectDto reviewObjectDto = modelMapper.map(review,ReviewObjectDto.class);
-        //reviewObjectDto.addCommentDto(review.getComments());
-        return reviewObjectDto;
-    }
-
 
 }
